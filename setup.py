@@ -39,11 +39,11 @@ setup(
     long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords='spib',
-    name='spib',
+    name='fspib',
     packages=find_packages(include=['spib', 'spib.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/wangdedi1997/spib',
+    url='https://github.com/erb24/spib/tree/optim',
     version='1.1.0',
     zip_safe=False,
 )
