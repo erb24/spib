@@ -27,6 +27,8 @@ What is it?
 
 SPIB is a deep learning-based framework for dimension reduction and Markov model construction of MD trajectories. Please read and cite this manuscript when using SPIB: https://aip.scitation.org/doi/abs/10.1063/5.0038198. Here is an implementation of SPIB in Pytorch.
 
+I (Eric) have modified this branch to incorporate the physics-based penalty term in the loss function. 
+
 Installation
 ------------
 
