@@ -208,62 +208,62 @@ class SPIB(nn.Module):
         # KL Divergence
         kl_loss = torch.sum(data_weights*(log_q-log_p))/data_weights.sum()
 
-    # just keep the thermodynamic penalty function for now
-	if self.penalty == 'delta_variational':
-		import util
-		if self.output_thermo:
-			if z_mean.shape[1] == 1:
-				aux_loss, G11, U11, S11 = constraints.delta_variational(data_inputs, z_mean, self.Ut, 
-                                                                        bandwidth = self.bandwidth, output_thermo = True, 
-                                                                        weights = data_weights)
-				#print(aux_loss)
-			elif z_mean.shape[1] == 2:
-				aux_loss, G11, U11, S11, G22, U22, S22 = constraints.delta_variational(data_inputs, z_mean, self.Ut, 
-                                                                                       bandwidth = self.bandwidth, 
-                                                                                       output_thermo = True, 
-                                                                                       weights = data_weights)
-				#print(aux_loss)
-			else:
-				print("Not implemented yet")
-		else:
-			aux_loss = constraints.delta_variational(data_inputs, z_mean, self.Ut, bandwidth = self.bandwidth, 
-                                                     weights = data_weights)
-			#print(data_inputs.shape, z_mean.shape, Ut.shape, data_weights)
-		loss = reconstruction_error + beta*kl_loss + gamma * aux_loss
-	#elif penalty == 'logsumexp_variational':
-	#	import util
-	#	if output_thermo:
-	#		if z_mean.shape[1] == 1:
-	#			aux_loss, G11, U11, S11 = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, output_thermo = True, weights = data_weights)
-	#		elif z_mean.shape[1] == 2:
-	#			aux_loss, G11, U11, S11, G22, U22, S22 = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, output_thermo = True, weights = data_weights)
-	#		else:
-	#			print("Not implemented yet")
-	#	else:
-	#		aux_loss = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, weights = data_weights)
-	#	loss = reconstruction_error + beta*kl_loss + gamma * aux_loss
-	else:
-		if self.output_thermo:
-			import util
-			if z_mean.shape[1] == 1:
-				aux_loss, G11, U11, S11 = constraints.dSz_point(data_inputs, z_mean, self.Ut, bandwidth = self.bandwidth, 
-                                                                output_thermo = True, weights = data_weights)
-			elif z_mean.shape[1] == 2:
-				aux_loss, G11, U11, S11, G22, U22, S22 = constraints.dSz_point(data_inputs, z_mean, self.Ut, 
-                                                                               bandwidth = self.bandwidth, 
-                                                                               output_thermo = True, weights = data_weights)
-			else:
-				print("Not implemented yet")
-		aux_loss = torch.tensor(0)
-		loss = reconstruction_error + beta*kl_loss
-
-	if self.output_thermo:
-		if z_mean.shape[1] == 1:
-			return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data, G11, U11, S11
-		else:
-			return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data, G11, U11, S11, G22, U22, S22
-	else:
-        return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data
+        # just keep the thermodynamic penalty function for now
+    	if self.penalty == 'delta_variational':
+    		import util
+    		if self.output_thermo:
+    			if z_mean.shape[1] == 1:
+    				aux_loss, G11, U11, S11 = constraints.delta_variational(data_inputs, z_mean, self.Ut, 
+                                                                            bandwidth = self.bandwidth, output_thermo = True, 
+                                                                            weights = data_weights)
+    				#print(aux_loss)
+    			elif z_mean.shape[1] == 2:
+    				aux_loss, G11, U11, S11, G22, U22, S22 = constraints.delta_variational(data_inputs, z_mean, self.Ut, 
+                                                                                           bandwidth = self.bandwidth, 
+                                                                                           output_thermo = True, 
+                                                                                           weights = data_weights)
+    				#print(aux_loss)
+    			else:
+    				print("Not implemented yet")
+    		else:
+    			aux_loss = constraints.delta_variational(data_inputs, z_mean, self.Ut, bandwidth = self.bandwidth, 
+                                                         weights = data_weights)
+    			#print(data_inputs.shape, z_mean.shape, Ut.shape, data_weights)
+    		loss = reconstruction_error + beta*kl_loss + gamma * aux_loss
+    	#elif penalty == 'logsumexp_variational':
+    	#	import util
+    	#	if output_thermo:
+    	#		if z_mean.shape[1] == 1:
+    	#			aux_loss, G11, U11, S11 = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, output_thermo = True, weights = data_weights)
+    	#		elif z_mean.shape[1] == 2:
+    	#			aux_loss, G11, U11, S11, G22, U22, S22 = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, output_thermo = True, weights = data_weights)
+    	#		else:
+    	#			print("Not implemented yet")
+    	#	else:
+    	#		aux_loss = constraints.logsumexp_variational(data_inputs, z_mean, Ut, bandwidth = bandwidth, weights = data_weights)
+    	#	loss = reconstruction_error + beta*kl_loss + gamma * aux_loss
+    	else:
+    		if self.output_thermo:
+    			import util
+    			if z_mean.shape[1] == 1:
+    				aux_loss, G11, U11, S11 = constraints.dSz_point(data_inputs, z_mean, self.Ut, bandwidth = self.bandwidth, 
+                                                                    output_thermo = True, weights = data_weights)
+    			elif z_mean.shape[1] == 2:
+    				aux_loss, G11, U11, S11, G22, U22, S22 = constraints.dSz_point(data_inputs, z_mean, self.Ut, 
+                                                                                   bandwidth = self.bandwidth, 
+                                                                                   output_thermo = True, weights = data_weights)
+    			else:
+    				print("Not implemented yet")
+    		aux_loss = torch.tensor(0)
+    		loss = reconstruction_error + beta*kl_loss
+    
+    	if self.output_thermo:
+    		if z_mean.shape[1] == 1:
+    			return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data, G11, U11, S11
+    		else:
+    			return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data, G11, U11, S11, G22, U22, S22
+    	else:
+            return loss, reconstruction_error.detach().cpu().data, kl_loss.detach().cpu().data, aux_loss.detach().cpu().data
 
     def log_p (self, z, sum_up=True):
         # get representative_z
