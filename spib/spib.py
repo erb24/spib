@@ -53,7 +53,7 @@ class SPIB(nn.Module):
     def __init__(self, output_dim, data_shape, encoder_type='Nonlinear', z_dim=2, lagtime=1, beta=1e-3,
                  learning_rate=1e-3, lr_scheduler_gamma=1, device=torch.device("cpu"),
                  path='./spib', UpdateLabel=True, neuron_num1=64, neuron_num2=64, data_transform=None, score_model=None,
-                gamma = 0.0, Ut = None, penalty = None, b = False, output_thermo = False, bandwidth = 0.1):
+                gamma = 0.0, Ut = False, penalty = None, b = False, output_thermo = False, bandwidth = 0.1):
 
         super(SPIB, self).__init__()
         if encoder_type == 'Nonlinear':
@@ -66,6 +66,7 @@ class SPIB(nn.Module):
         self.beta = beta
         # add parameters for physical SPIB
         self.gamma = gamma
+        # reports on whether I am performing thermodynamic optimization or not
         self.Ut = Ut
         self.bandwidth = bandwidth
         self.penalty = penalty

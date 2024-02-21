@@ -53,6 +53,8 @@ nn2 = 64
 nn_list = [(16, 16), (32, 32), (64, 64)]
 
 lr = 1e-4
+gamma = 0.0
+penalty = "None"
 
 # Import data
 traj_data_list = []
@@ -128,7 +130,8 @@ for beta in beta_list:
 
 			train_dataset, test_dataset = prepare_data(divtraj, divlabel, weight_list=None, output_dim=output_dim,
 													lagtime=dt, subsampling_timestep=subsampling_timestep, 
-													train_indices=train_indices, test_indices=test_indices, device=device)
+													train_indices=train_indices, test_indices=test_indices, device=device,
+													Ut_list=None)
 
 			# scoring model for prepared dataset
 			# lagtime should be divided by subsampling_timestep 
