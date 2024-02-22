@@ -196,6 +196,3 @@ def data_init(dt, timestep, traj_data, traj_label, traj_weights, traj_Ut):
 		Ut = None
 
 	return past_data, future_data, label, weights, Ut
-
-
-
