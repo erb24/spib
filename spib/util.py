@@ -3,6 +3,7 @@
 import numpy as np
 from scipy import optimize
 import torch
+
 def list_enumerate(sequence, start=0):
     n = start
     for elem in sequence:
