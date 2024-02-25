@@ -769,7 +769,7 @@ class SPIB(nn.Module):
 		aux_loss /= weight_sum
 
 		final_result += [loss.cpu().data.numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy(),
-		axus_loss.cpu().data.numpy()]
+		aux_loss.cpu().data.numpy()]
 		print(
 			"Loss (test) %f\tKL loss (test): %f\n"
 			"Reconstruction loss (test) %f\t Auxillary loss (test) %f"
