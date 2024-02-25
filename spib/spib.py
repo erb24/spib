@@ -772,11 +772,11 @@ class SPIB(nn.Module):
 		axus_loss.cpu().data.numpy()]
 		print(
 			"Loss (test) %f\tKL loss (test): %f\n"
-			"Reconstruction loss (test) %f\t Auxillary loss (test)"
+			"Reconstruction loss (test) %f\t Auxillary loss (test) %f"
 			% (loss, kl_loss, reconstruction_error, aux_loss))
 		print(
 			"Loss (test) %f\tKL loss (test): %f\n"
-			"Reconstruction loss (test) %f\t Auxillary loss (test)"
+			"Reconstruction loss (test) %f\t Auxillary loss (test) %f"
 			% (loss, kl_loss, reconstruction_error, aux_loss), file=open(summary_path, 'a'))
 
 		print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
