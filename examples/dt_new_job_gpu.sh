@@ -3,7 +3,7 @@
 #SBATCH --job-name=hp35
 #SBATCH -N 1
 #SBATCH --ntasks=1
-#SBTACH -n 16
+#SBTACH -n 1
 #SBATCH --gpus=a100:1
 #SBATCH -p gpu
 
@@ -15,4 +15,4 @@ export OMP_NUM_THREADS=1
 
 #python run_spib_msm_cv.py
 
-python dt_run_spib_msm_cv.py
+python dt_run_spib_cv.py
