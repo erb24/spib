@@ -104,7 +104,7 @@ for i in range(num_div):
 
 # split data into train and test set
 indices = list(range(num_div))
-split = int(np.floor(0.1 * num_div))
+split = np.max((1, int(np.floor(0.1 * num_div))))
 
 np.random.shuffle(indices)
 train_indices, test_indices = indices[split:], indices[:split]

@@ -138,8 +138,8 @@ class TimeLaggedDataset(torch.utils.data.Dataset):
 
 		if Ut_list is None:
 			# set energy as zero
-			weight_list = [np.zeros_like(label_list[i]) for i in range(len(label_list))]			
-
+			Ut_list = [np.zeros_like(label_list[i]) for i in range(len(label_list))]
+            
 		data_init_list = []
 		for i in range(len(data_list)):
 			data_init_list += [data_init(self.lagtime, self.subsampling_timestep, data_list[i], label_list[i], weight_list[i],

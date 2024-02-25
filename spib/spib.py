@@ -71,7 +71,7 @@ class SPIB(nn.Module):
 		self.Ut = Ut
 		self.bandwidth = bandwidth
 		self.penalty = penalty
-		self.output_thermo - output_thermo
+		self.output_thermo = output_thermo
 					
 		self.learning_rate = learning_rate
 		self.lr_scheduler_gamma = lr_scheduler_gamma
@@ -195,6 +195,7 @@ class SPIB(nn.Module):
 	# Loss function
 	# ------------------------------------------------------------------------------
 	def calculate_loss(self, data_inputs, data_targets, data_weights):
+        
 
 		# pass through VAE
 		outputs, z_sample, z_mean, z_logvar = self.forward(data_inputs)
@@ -230,7 +231,7 @@ class SPIB(nn.Module):
 				aux_loss = constraints.delta_variational(data_inputs, z_mean, self.Ut, bandwidth = self.bandwidth, 
 														 weights = data_weights)
 				#print(data_inputs.shape, z_mean.shape, Ut.shape, data_weights)
-			loss = reconstruction_error + beta*kl_loss + gamma * aux_loss
+			loss = reconstruction_error + self.beta*kl_loss + self.gamma * aux_loss
 		#elif penalty == 'logsumexp_variational':
 		#	import util
 		#	if output_thermo:
@@ -255,7 +256,7 @@ class SPIB(nn.Module):
 				else:
 					print("Not implemented yet")
 			aux_loss = torch.tensor(0)
-			loss = reconstruction_error + beta*kl_loss
+			loss = reconstruction_error + self.beta*kl_loss
 		
 		if self.output_thermo:
 			if z_mean.shape[1] == 1:
@@ -484,10 +485,7 @@ class SPIB(nn.Module):
 			for batch_inputs, batch_outputs, batch_weights in train_dataloader:
 				step += 1
 
-				if self.penalty is None:
-					loss, reconstruction_error, kl_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
-				else:
-					loss, reconstruction_error, kl_loss, aux_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
+				loss, reconstruction_error, kl_loss, aux_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
 
 				# Stop if NaN is obtained
 				if(torch.isnan(loss).any()):
@@ -519,27 +517,16 @@ class SPIB(nn.Module):
 			if self.penalty is not None:
 				train_epoch_aux_loss /= weight_sum
 
-			if self.penalty is None:
-				print(
-					"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f" % (
-						epoch, train_time, train_epoch_loss, train_epoch_kl_loss, train_epoch_reconstruction_error))
-				print(
-					"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f" % (
-						epoch, train_time, train_epoch_loss, train_epoch_kl_loss,
-						train_epoch_reconstruction_error), file=open(log_path, 'a'))
-			else:
-				print(
-					"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f \t Auxillary loss (train) %f" % (
-						epoch, train_time, train_epoch_loss, train_epoch_kl_loss, train_epoch_reconstruction_error, 
-						train_epoch_aux_loss))
-				print(
-					"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f \t Auxillary loss (train) %f" % (
-						epoch, train_time, train_epoch_loss, train_epoch_kl_loss, train_epoch_reconstruction_error, 
-						train_epoch_aux_loss), file=open(log_path, 'a'))
+			print(
+				"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
+				"Reconstruction loss (train) %f \t Auxillary loss (train) %f" % (
+					epoch, train_time, train_epoch_loss, train_epoch_kl_loss, train_epoch_reconstruction_error, 
+					train_epoch_aux_loss))
+			print(
+				"Epoch %i:\tTime %f s\nLoss (train) %f\tKL loss (train): %f\n"
+				"Reconstruction loss (train) %f \t Auxillary loss (train) %f" % (
+					epoch, train_time, train_epoch_loss, train_epoch_kl_loss, train_epoch_reconstruction_error, 
+					train_epoch_aux_loss), file=open(log_path, 'a'))
 
 			test_epoch_loss = 0
 			test_epoch_kl_loss = 0
@@ -547,10 +534,9 @@ class SPIB(nn.Module):
 			test_epoch_aux_loss = 0
 			for batch_inputs, batch_outputs, batch_weights in test_dataloader:
 
-				if self.penalty is None:
-					loss, reconstruction_error, kl_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
-				else:
-					loss, reconstruction_error, kl_loss, aux_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
+
+
+				loss, reconstruction_error, kl_loss, aux_loss = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
 
 				weight_sum = batch_weights.sum().cpu()
 				test_epoch_loss += loss.cpu().data * weight_sum
@@ -564,25 +550,16 @@ class SPIB(nn.Module):
 			test_epoch_reconstruction_error /= weight_sum
 			test_epoch_aux_loss /= weight_sum
 
-			if self.penalty is None:
-				print(
-					"Loss (test) %f\tKL loss (test): %f\n"
-					"Reconstruction loss (test) %f" % (
-						test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error))
-				print(
-					"Loss (test) %f\tKL loss (test): %f\n"
-					"Reconstruction loss (test) %f" % (
-						test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error), file=open(log_path, 'a'))
-			else:
-				print(
-					"Loss (test) %f\tKL loss (test): %f\n"
-					"Reconstruction loss (test) %f \t Auxillary loss (test) %f" % (
-						test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error, test_aux_loss))
-				print(
-					"Loss (test) %f\tKL loss (test): %f\n"
-					"Reconstruction loss (test) %f \t Auxillary loss (test) %f" % (
-						test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error, 
-						test_epoch_aux_loss), file=open(log_path, 'a'))
+
+			print(
+				"Loss (test) %f\tKL loss (test): %f\n"
+				"Reconstruction loss (test) %f \t Auxillary loss (test) %f" % (
+					test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error, test_epoch_aux_loss))
+			print(
+				"Loss (test) %f\tKL loss (test): %f\n"
+				"Reconstruction loss (test) %f \t Auxillary loss (test) %f" % (
+					test_epoch_loss, test_epoch_kl_loss, test_epoch_reconstruction_error, 
+					test_epoch_aux_loss), file=open(log_path, 'a'))
 
 			self.test_loss_history += [[step, test_epoch_loss.cpu().data.numpy()]]
 
