@@ -743,11 +743,11 @@ class SPIB(nn.Module):
 		final_result += [loss.data.cpu().numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy()]
 		print(
 			"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
+					"Reconstruction loss (train) %f\t Auxillary loss (train) %f" % (
 				index, loss, kl_loss, reconstruction_error, aux_loss))
 		print(
 			"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-					"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
+					"Reconstruction loss (train) %f\t Auxillary loss (train) %f" % (
 				index, loss, kl_loss, reconstruction_error, aux_loss),
 			file=open(summary_path, 'a'))
 
