@@ -723,131 +723,70 @@ class SPIB(nn.Module):
 
 		final_result = []
 		# output the result
-		if self.penalty is None:
-			loss, reconstruction_error, kl_loss = [0 for i in range(3)]
+		loss, reconstruction_error, kl_loss, aux_loss = [0 for i in range(4)]
 
-			for batch_inputs, batch_outputs, batch_weights in train_dataloader:
-				loss1, reconstruction_error1, kl_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
+		for batch_inputs, batch_outputs, batch_weights in train_dataloader:
+			loss1, reconstruction_error1, kl_loss1, axus_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
 
-				loss += loss1 * batch_weights.sum()
-				kl_loss += kl_loss1 * batch_weights.sum()
-				reconstruction_error += reconstruction_error1 * batch_weights.sum()
+			loss += loss1 * batch_weights.sum()
+			kl_loss += kl_loss1 * batch_weights.sum()
+			reconstruction_error += reconstruction_error1 * batch_weights.sum()
+			aux_loss += axus_loss1 * batch_weights.sum()
 
-			# output the result
-			weight_sum = train_dataset.data_weights.sum()
-			loss /= weight_sum
-			kl_loss /= weight_sum
-			reconstruction_error /= weight_sum
+		# output the result
+		weight_sum = train_dataset.data_weights.sum()
+		loss /= weight_sum
+		kl_loss /= weight_sum
+		reconstruction_error /= weight_sum
+		aux_loss /= weight_sum
 
-			final_result += [loss.data.cpu().numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy()]
-			print(
-				"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-						"Reconstruction loss (train) %f" % (
-					index, loss, kl_loss, reconstruction_error))
-			print(
-				"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-						"Reconstruction loss (train) %f" % (
-					index, loss, kl_loss, reconstruction_error),
-				file=open(summary_path, 'a'))
+		final_result += [loss.data.cpu().numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy()]
+		print(
+			"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
+					"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
+				index, loss, kl_loss, reconstruction_error, aux_loss))
+		print(
+			"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
+					"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
+				index, loss, kl_loss, reconstruction_error, aux_loss),
+			file=open(summary_path, 'a'))
 
-			loss, reconstruction_error, kl_loss = [0 for i in range(3)]
+		loss, reconstruction_error, kl_loss, aux_loss = [0 for i in range(4)]
 
-			for batch_inputs, batch_outputs, batch_weights in test_dataloader:
-				loss1, reconstruction_error1, kl_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
+		for batch_inputs, batch_outputs, batch_weights in test_dataloader:
+			loss1, reconstruction_error1, kl_loss1, aux_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
 
-				loss += loss1 * batch_weights.sum()
-				kl_loss += kl_loss1 * batch_weights.sum()
-				reconstruction_error += reconstruction_error1 * batch_weights.sum()
+			loss += loss1 * batch_weights.sum()
+			kl_loss += kl_loss1 * batch_weights.sum()
+			reconstruction_error += reconstruction_error1 * batch_weights.sum()
+			aux_loss += aux_loss1 * batch_weights.sum()
 
-			# output the result
-			weight_sum = test_dataset.data_weights.sum()
-			loss /= weight_sum
-			kl_loss /= weight_sum
-			reconstruction_error /= weight_sum
+		# output the result
+		weight_sum = test_dataset.data_weights.sum()
+		loss /= weight_sum
+		kl_loss /= weight_sum
+		reconstruction_error /= weight_sum
+		aux_loss /= weight_sum
 
-			final_result += [loss.cpu().data.numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy()]
-			print(
-				"Loss (test) %f\tKL loss (test): %f\n"
-				"Reconstruction loss (test) %f"
-				% (loss, kl_loss, reconstruction_error))
-			print(
-				"Loss (test) %f\tKL loss (test): %f\n"
-				"Reconstruction loss (test) %f"
-				% (loss, kl_loss, reconstruction_error), file=open(summary_path, 'a'))
+		final_result += [loss.cpu().data.numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy(),
+		axus_loss.cpu().data.numpy()]
+		print(
+			"Loss (test) %f\tKL loss (test): %f\n"
+			"Reconstruction loss (test) %f\t Auxillary loss (test)"
+			% (loss, kl_loss, reconstruction_error, aux_loss))
+		print(
+			"Loss (test) %f\tKL loss (test): %f\n"
+			"Reconstruction loss (test) %f\t Auxillary loss (test)"
+			% (loss, kl_loss, reconstruction_error, aux_loss), file=open(summary_path, 'a'))
 
-			print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
-				self.lagtime, self.beta, self.learning_rate))
-			print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
-				self.lagtime, self.beta, self.learning_rate),
-				file=open(summary_path, 'a'))
+		print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
+			self.lagtime, self.beta, self.learning_rate))
+		print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
+			self.lagtime, self.beta, self.learning_rate),
+			file=open(summary_path, 'a'))
 
-			final_result = np.array(final_result)
-			np.save(final_result_path, final_result)
-		else:
-			loss, reconstruction_error, kl_loss, aux_loss = [0 for i in range(4)]
-
-			for batch_inputs, batch_outputs, batch_weights in train_dataloader:
-				loss1, reconstruction_error1, kl_loss1, axus_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
-
-				loss += loss1 * batch_weights.sum()
-				kl_loss += kl_loss1 * batch_weights.sum()
-				reconstruction_error += reconstruction_error1 * batch_weights.sum()
-				aux_loss += axus_loss1 * batch_weights.sum()
-
-			# output the result
-			weight_sum = train_dataset.data_weights.sum()
-			loss /= weight_sum
-			kl_loss /= weight_sum
-			reconstruction_error /= weight_sum
-			aux_loss /= weight_sum
-
-			final_result += [loss.data.cpu().numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy()]
-			print(
-				"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-						"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
-					index, loss, kl_loss, reconstruction_error, aux_loss))
-			print(
-				"Final: %d\nLoss (train) %f\tKL loss (train): %f\n"
-						"Reconstruction loss (train) %f\t Auxillary loss (train)" % (
-					index, loss, kl_loss, reconstruction_error, aux_loss),
-				file=open(summary_path, 'a'))
-
-			loss, reconstruction_error, kl_loss, aux_loss = [0 for i in range(4)]
-
-			for batch_inputs, batch_outputs, batch_weights in test_dataloader:
-				loss1, reconstruction_error1, kl_loss1, aux_loss1 = self.calculate_loss(batch_inputs, batch_outputs, batch_weights)
-
-				loss += loss1 * batch_weights.sum()
-				kl_loss += kl_loss1 * batch_weights.sum()
-				reconstruction_error += reconstruction_error1 * batch_weights.sum()
-				aux_loss += aux_loss1 * batch_weights.sum()
-
-			# output the result
-			weight_sum = test_dataset.data_weights.sum()
-			loss /= weight_sum
-			kl_loss /= weight_sum
-			reconstruction_error /= weight_sum
-			aux_loss /= weight_sum
-
-			final_result += [loss.cpu().data.numpy(), reconstruction_error.cpu().data.numpy(), kl_loss.cpu().data.numpy(),
-			axus_loss.cpu().data.numpy()]
-			print(
-				"Loss (test) %f\tKL loss (test): %f\n"
-				"Reconstruction loss (test) %f\t Auxillary loss (test)"
-				% (loss, kl_loss, reconstruction_error, aux_loss))
-			print(
-				"Loss (test) %f\tKL loss (test): %f\n"
-				"Reconstruction loss (test) %f\t Auxillary loss (test)"
-				% (loss, kl_loss, reconstruction_error, aux_loss), file=open(summary_path, 'a'))
-
-			print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
-				self.lagtime, self.beta, self.learning_rate))
-			print("dt: %d\t Beta: %f\t Learning_rate: %f" % (
-				self.lagtime, self.beta, self.learning_rate),
-				file=open(summary_path, 'a'))
-
-			final_result = np.array(final_result)
-			np.save(final_result_path, final_result)
+		final_result = np.array(final_result)
+		np.save(final_result_path, final_result)
 
 	@torch.no_grad()
 	def transform(self, data, batch_size=128, to_numpy=False):
