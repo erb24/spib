@@ -73,18 +73,10 @@ for n, i in enumerate([1,2,3,4,5,6,10]):
 		traj_data = np.vstack([traj_data, np.load('restart%s/sparse_calculated_colvar.npy' % i)])
 	traj_data_list.append(np.load('restart%s/sparse_calculated_colvar.npy' % i))
 
-# Generate initial state labels using tICA + k-means
-tica_n_components = 2
-tica_lag_time = 1000
-kmeans_clusters = 10
-
-
-# In[3]:
-
 
 # Generate initial state labels using tICA + k-means
 tica_n_components = 2
-tica_lag_time = 1000
+tica_lag_time = 1
 kmeans_clusters = 10
 
 ## get tICA projection
